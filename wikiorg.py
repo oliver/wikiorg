@@ -83,7 +83,10 @@ class WikiOrgGui:
 
     def on_btnSave_clicked (self, widget):
         print "(save)"
-        pass
+        text = self.textBuffer.get_text(*self.textBuffer.get_bounds())
+        f = open(self.currentFile, "w")
+        f.write(text)
+        f.close()
 
     def linkHandler (self, url):
         print "link clicked (%s)" % url
