@@ -89,6 +89,11 @@ class WikiOrgGui:
         f.write(text)
         f.close()
 
+    def on_btnHome_clicked (self, widget):
+        print "(home)"
+        if not(self.editMode): # TODO: what to do if we're in edit mode?
+            self.displayMarkdown('index.markdown')
+
     def linkHandler (self, url):
         print "link clicked (%s)" % url
         if url.startswith('wiki://'):
