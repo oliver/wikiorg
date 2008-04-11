@@ -20,23 +20,22 @@ class WikiOrgGui:
         self.tree.signal_autoconnect(self)
 
         viewer = HtmlViewer()
-        #viewer.setLinkHandler(linkHandler)
-        viewer.setHTML("<h1>HTML viewer test</h1>\n<p>This is a test text; and a <a href='abc'>link</a></p>");
+        viewer.setLinkHandler(self.linkHandler)
+        viewer.setHTML("<h1>HTML viewer test</h1>\n<p>This is a test text; and a <a href='http://google.de'>link</a></p>");
         viewer.getWidget().show()
 
         viewerParent = self.tree.get_widget('mainScrollWin')
         viewerParent.add(viewer.getWidget())
 
-
-def linkHandler (url):
-    print "link clicked (%s)" % url
-    if url.startswith('http://'):
-        os.system("xdg-open '%s' &" % url)
-    elif url.startswith('wiki://'):
-        wikiword = url[7:]
-        filename = "./%s.markdown" % wikiword
-        print "(internal link to '%s'; file: '%s')" % (wikiword, filename)
-        displayMarkdown(viewer, filename)
+    def linkHandler (self, url):
+        print "link clicked (%s)" % url
+        if url.startswith('wiki://'):
+            wikiword = url[7:]
+            filename = "./%s.markdown" % wikiword
+            print "(internal link to '%s'; file: '%s')" % (wikiword, filename)
+            #displayMarkdown(viewer, filename)
+        else:
+            os.system("xdg-open '%s' &" % url)
 
 # TODO: maybe use another syntax for wiki links.
 # See http://boodler.org/wiki/show/Markdown/ for an idea
