@@ -27,7 +27,7 @@ class WikiOrgGui:
         viewerParent = self.tree.get_widget('mainScrollWin')
         viewerParent.add(self.viewer.getWidget())
 
-        self.displayMarkdown('example.markdown')
+        self.displayMarkdown('index.markdown')
 
     def on_mainWindow_delete_event (self, widget, dummy):
         gtk.main_quit()

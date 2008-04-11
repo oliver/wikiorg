@@ -20,3 +20,6 @@ I get 10 times more traffic from [Google][] than from
 
 *italic*   **bold**
 _italic_   __bold__
+
+
+(back to main page: [[index]])
