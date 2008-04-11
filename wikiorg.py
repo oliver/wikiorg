@@ -35,6 +35,11 @@ class WikiOrgGui:
 
         viewerParent.add(self.viewer.getWidget())
 
+        # set up text buffer:
+        fontName = "Monospace"
+        pangoFont = pango.FontDescription(fontName)
+        self.textView.modify_font(pangoFont)
+
         # add TextBuffer for text view:
         self.textBuffer = gtk.TextBuffer(None)
         self.textView.set_buffer(self.textBuffer)
