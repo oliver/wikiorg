@@ -3,7 +3,30 @@
 import os
 import re
 import gtk
+import gtk.glade
+from gtk import gdk
+import gobject
+import pango
+
 from htmlviewer import HtmlViewer
+
+
+class WikiOrgGui:
+    """ Main class for this application (holds the GUI etc.) """
+    def __init__ (self):
+        self.gladeFile = "wikiorg.glade"
+        self.tree = gtk.glade.XML(self.gladeFile)
+
+        self.tree.signal_autoconnect(self)
+
+        viewer = HtmlViewer()
+        #viewer.setLinkHandler(linkHandler)
+        viewer.setHTML("<h1>HTML viewer test</h1>\n<p>This is a test text; and a <a href='abc'>link</a></p>");
+        viewer.getWidget().show()
+
+        viewerParent = self.tree.get_widget('mainScrollWin')
+        viewerParent.add(viewer.getWidget())
+
 
 def linkHandler (url):
     print "link clicked (%s)" % url
@@ -30,19 +53,21 @@ def displayMarkdown (viewer, filename):
         viewer.setHTML(html)
 
 if __name__ == "__main__":
-    viewer = HtmlViewer()
-    viewer.setLinkHandler(linkHandler)
-    #viewer.setHTML("<h1>HTML viewer test</h1>\n<p>This is a test text; and a <a href='abc'>link</a></p>");
+    #viewer = HtmlViewer()
+    #viewer.setLinkHandler(linkHandler)
+    ##viewer.setHTML("<h1>HTML viewer test</h1>\n<p>This is a test text; and a <a href='abc'>link</a></p>");
 
-    sw = gtk.ScrolledWindow()
-    sw.add(viewer.getWidget())
+    #sw = gtk.ScrolledWindow()
+    #sw.add(viewer.getWidget())
 
-    window = gtk.Window()
-    window.add(sw)
-    window.set_default_size(400, 400)
+    #window = gtk.Window()
+    #window.add(sw)
+    #window.set_default_size(400, 400)
 
-    window.show_all()
+    #window.show_all()
 
-    displayMarkdown(viewer, "example.markdown")
+    #displayMarkdown(viewer, "example.markdown")
+
+    gui = WikiOrgGui()
 
     gtk.main()
