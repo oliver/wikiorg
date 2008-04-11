@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.1 on Fri Apr 11 22:18:50 2008 -->
+<!--Generated with glade3 3.4.1 on Fri Apr 11 23:58:19 2008 -->
 <glade-interface>
   <widget class="GtkWindow" id="mainWindow">
     <property name="visible">True</property>
@@ -181,11 +181,12 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbutton1">
+              <widget class="GtkToolButton" id="btnSave">
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="stock_id">gtk-save</property>
+                <signal name="clicked" handler="on_btnSave_clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>

@@ -56,6 +56,9 @@ class WikiOrgGui:
             child = parent.get_children()[0]
             assert(child == self.textView)
             parent.remove(child)
+
+            self.tree.get_widget('btnSave').set_property('sensitive', False)
+
             parent.add(self.viewer.getWidget())
             self.tree.get_widget('btnEdit').set_property('stock_id', 'gtk-edit')
             self.editMode = False
@@ -75,6 +78,12 @@ class WikiOrgGui:
             parent.add(self.textView)
             self.tree.get_widget('btnEdit').set_property('stock_id', 'gtk-ok')
             self.editMode = True
+
+            self.tree.get_widget('btnSave').set_property('sensitive', True)
+
+    def on_btnSave_clicked (self, widget):
+        print "(save)"
+        pass
 
     def linkHandler (self, url):
         print "link clicked (%s)" % url
