@@ -95,6 +95,13 @@ class WikiOrgGui:
             wikiword = url[7:]
             filename = "./%s.markdown" % wikiword
             print "(internal link to '%s'; file: '%s')" % (wikiword, filename)
+
+            if not(os.path.exists(filename)): # TODO: check for directory, and regular file, and whatnot...
+                # create new file
+                f = open(filename, "w")
+                f.write("enter text for %s here..." % wikiword)
+                f.close()
+                # TODO: maybe switch to edit mode here?
             self.displayMarkdown(filename)
         else:
             os.system("xdg-open '%s' &" % url)
