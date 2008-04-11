@@ -25,12 +25,25 @@ class WikiOrgGui:
         self.viewer.getWidget().show()
 
         viewerParent = self.tree.get_widget('mainScrollWin')
+
+        # remove the TextView from ScrolledWindow but keep it for later:
+        self.textView = viewerParent.get_children()[0]
+        viewerParent.remove(self.textView)
+
         viewerParent.add(self.viewer.getWidget())
 
         self.displayMarkdown('index.markdown')
 
     def on_mainWindow_delete_event (self, widget, dummy):
         gtk.main_quit()
+
+    def on_btnEdit_clicked (self, widget):
+        print "(edit)"
+        parent = self.tree.get_widget('mainScrollWin')
+        child = parent.get_children()[0]
+        assert(child == self.viewer.getWidget())
+        parent.remove(child)
+        parent.add(self.textView)
 
     def linkHandler (self, url):
         print "link clicked (%s)" % url
