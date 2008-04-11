@@ -16,6 +16,7 @@ class WikiOrgGui:
     def __init__ (self):
         self.gladeFile = "wikiorg.glade"
         self.tree = gtk.glade.XML(self.gladeFile)
+        self.editMode = False
 
         self.tree.signal_autoconnect(self)
 
@@ -38,12 +39,24 @@ class WikiOrgGui:
         gtk.main_quit()
 
     def on_btnEdit_clicked (self, widget):
-        print "(edit)"
-        parent = self.tree.get_widget('mainScrollWin')
-        child = parent.get_children()[0]
-        assert(child == self.viewer.getWidget())
-        parent.remove(child)
-        parent.add(self.textView)
+        if self.editMode:
+            print "(back to view)"
+            parent = self.tree.get_widget('mainScrollWin')
+            child = parent.get_children()[0]
+            assert(child == self.textView)
+            parent.remove(child)
+            parent.add(self.viewer.getWidget())
+            self.tree.get_widget('btnEdit').set_property('stock_id', 'gtk-edit')
+            self.editMode = False
+        else:
+            print "(edit)"
+            parent = self.tree.get_widget('mainScrollWin')
+            child = parent.get_children()[0]
+            assert(child == self.viewer.getWidget())
+            parent.remove(child)
+            parent.add(self.textView)
+            self.tree.get_widget('btnEdit').set_property('stock_id', 'gtk-ok')
+            self.editMode = True
 
     def linkHandler (self, url):
         print "link clicked (%s)" % url
