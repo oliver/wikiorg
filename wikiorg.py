@@ -29,6 +29,9 @@ class WikiOrgGui:
 
         self.displayMarkdown('example.markdown')
 
+    def on_mainWindow_delete_event (self, widget, dummy):
+        gtk.main_quit()
+
     def linkHandler (self, url):
         print "link clicked (%s)" % url
         if url.startswith('wiki://'):
