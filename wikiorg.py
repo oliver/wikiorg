@@ -56,22 +56,7 @@ class WikiOrgGui:
             html = self.convertWikiLinks(html)
             self.viewer.setHTML(html)
 
+
 if __name__ == "__main__":
-    #viewer = HtmlViewer()
-    #viewer.setLinkHandler(linkHandler)
-    ##viewer.setHTML("<h1>HTML viewer test</h1>\n<p>This is a test text; and a <a href='abc'>link</a></p>");
-
-    #sw = gtk.ScrolledWindow()
-    #sw.add(viewer.getWidget())
-
-    #window = gtk.Window()
-    #window.add(sw)
-    #window.set_default_size(400, 400)
-
-    #window.show_all()
-
-    #displayMarkdown(viewer, "example.markdown")
-
     gui = WikiOrgGui()
-
     gtk.main()
