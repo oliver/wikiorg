@@ -58,6 +58,7 @@ class WikiOrgGui:
             parent.remove(child)
 
             self.tree.get_widget('btnSave').set_property('sensitive', False)
+            self.displayMarkdown(self.currentFile)
 
             parent.add(self.viewer.getWidget())
             self.tree.get_widget('btnEdit').set_property('stock_id', 'gtk-edit')
