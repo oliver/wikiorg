@@ -14,6 +14,8 @@ from htmlviewer import HtmlViewer
 class WikiOrgGui:
     """ Main class for this application (holds the GUI etc.) """
     def __init__ (self):
+        self.currentFile = None
+
         self.gladeFile = "wikiorg.glade"
         self.tree = gtk.glade.XML(self.gladeFile)
         self.editMode = False
@@ -32,6 +34,10 @@ class WikiOrgGui:
         viewerParent.remove(self.textView)
 
         viewerParent.add(self.viewer.getWidget())
+
+        # add TextBuffer for text view:
+        self.textBuffer = gtk.TextBuffer(None)
+        self.textView.set_buffer(self.textBuffer)
 
         self.displayMarkdown('index.markdown')
 
@@ -54,6 +60,13 @@ class WikiOrgGui:
             child = parent.get_children()[0]
             assert(child == self.viewer.getWidget())
             parent.remove(child)
+
+            # load file content:
+            f = open(self.currentFile, "r")
+            text = f.read()
+            f.close()
+            self.textBuffer.set_text(text)
+
             parent.add(self.textView)
             self.tree.get_widget('btnEdit').set_property('stock_id', 'gtk-ok')
             self.editMode = True
@@ -81,6 +94,7 @@ class WikiOrgGui:
         if (html):
             html = self.convertWikiLinks(html)
             self.viewer.setHTML(html)
+            self.currentFile = filename
 
 
 if __name__ == "__main__":
