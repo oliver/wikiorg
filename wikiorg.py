@@ -49,6 +49,9 @@ class WikiOrgGui:
     def on_mainWindow_delete_event (self, widget, dummy):
         gtk.main_quit()
 
+    def on_miQuit_activate (self, dummy):
+        gtk.main_quit()
+
     def on_btnEdit_clicked (self, widget):
         if self.editMode:
             print "(back to view)"
