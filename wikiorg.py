@@ -15,27 +15,25 @@ class WikiOrgGui:
     """ Main class for this application (holds the GUI etc.) """
     def __init__ (self):
         self.currentFile = None
+        self.editMode = False
 
         self.gladeFile = "wikiorg.glade"
         self.tree = gtk.glade.XML(self.gladeFile)
-        self.editMode = False
-
         self.tree.signal_autoconnect(self)
 
+        # set up HTML viewer widget:
         self.viewer = HtmlViewer()
         self.viewer.setLinkHandler(self.linkHandler)
-        self.viewer.setHTML("<h1>HTML viewer test</h1>\n<p>This is a test text; and a <a href='http://google.de'>link</a></p>");
         self.viewer.getWidget().show()
 
-        viewerParent = self.tree.get_widget('mainScrollWin')
-
         # remove the TextView from ScrolledWindow but keep it for later:
+        viewerParent = self.tree.get_widget('mainScrollWin')
         self.textView = viewerParent.get_children()[0]
         viewerParent.remove(self.textView)
-
+        # instead, add the HTML viewer widget:
         viewerParent.add(self.viewer.getWidget())
 
-        # set up text buffer:
+        # set up text view:
         fontName = "Monospace"
         pangoFont = pango.FontDescription(fontName)
         self.textView.modify_font(pangoFont)
@@ -44,6 +42,7 @@ class WikiOrgGui:
         self.textBuffer = gtk.TextBuffer(None)
         self.textView.set_buffer(self.textBuffer)
 
+        # display start page:
         self.displayMarkdown('index.markdown')
 
     def on_mainWindow_delete_event (self, widget, dummy):
@@ -111,6 +110,7 @@ class WikiOrgGui:
         self.tree.get_widget('miSave').set_property('sensitive', True)
 
     def linkHandler (self, url):
+        """Is called when a link is clicked in HTML view"""
         print "link clicked (%s)" % url
         if url.startswith('wiki://'):
             wikiword = url[7:]
@@ -130,11 +130,13 @@ class WikiOrgGui:
     # TODO: maybe use another syntax for wiki links.
     # See http://boodler.org/wiki/show/Markdown/ for an idea
     def convertWikiLinks (self, html):
+        """ Converts Wiki links in the given HTML text to HTML tags """
         newHtml = re.sub("\[\[([\w ]+)\]\]",
             lambda x: "<a href='wiki://"+x.groups()[0]+"'>"+x.groups()[0]+"</a>", html)
         return newHtml
 
     def displayMarkdown (self, filename):
+        """ Convert the given Markdown+WikiLink text to HTML, and display the HTML """
         cmd = "perl Markdown.pl < '%s'" % filename
         html = os.popen(cmd).read()
         if (html):
