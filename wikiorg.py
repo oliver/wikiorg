@@ -60,6 +60,8 @@ class WikiOrgGui:
             assert(child == self.textView)
             parent.remove(child)
 
+            self.textBuffer.disconnect(self.changeHandlerId)
+            self.changeHandlerId = None
             self.tree.get_widget('btnSave').set_property('sensitive', False)
             self.tree.get_widget('miSave').set_property('sensitive', False)
             self.displayMarkdown(self.currentFile)
@@ -79,13 +81,11 @@ class WikiOrgGui:
             text = f.read()
             f.close()
             self.textBuffer.set_text(text)
+            self.changeHandlerId = self.textBuffer.connect('changed', self.on_textBuffer_changed)
 
             parent.add(self.textView)
             self.tree.get_widget('btnEdit').set_property('stock_id', 'gtk-ok')
             self.editMode = True
-
-            self.tree.get_widget('btnSave').set_property('sensitive', True)
-            self.tree.get_widget('miSave').set_property('sensitive', True)
 
     def on_btnSave_clicked (self, widget):
         print "(save)"
@@ -93,6 +93,8 @@ class WikiOrgGui:
         f = open(self.currentFile, "w")
         f.write(text)
         f.close()
+        self.tree.get_widget('btnSave').set_property('sensitive', False)
+        self.tree.get_widget('miSave').set_property('sensitive', False)
 
     def on_miSave_activate (self, dummy):
         print "(miSave)"
@@ -103,6 +105,10 @@ class WikiOrgGui:
         print "(home)"
         if not(self.editMode): # TODO: what to do if we're in edit mode?
             self.displayMarkdown('index.markdown')
+
+    def on_textBuffer_changed (self, textBuffer):
+        self.tree.get_widget('btnSave').set_property('sensitive', True)
+        self.tree.get_widget('miSave').set_property('sensitive', True)
 
     def linkHandler (self, url):
         print "link clicked (%s)" % url
