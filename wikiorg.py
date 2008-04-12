@@ -132,7 +132,7 @@ class WikiOrgGui:
     def convertWikiLinks (self, html):
         """ Converts Wiki links in the given HTML text to HTML tags """
         newHtml = re.sub("\[\[([\w ]+)\]\]",
-            lambda x: "<a href='wiki://"+x.groups()[0]+"'>"+x.groups()[0]+"</a>", html)
+            lambda x: "<a class='wikilink' href='wiki://"+x.groups()[0]+"'>"+x.groups()[0]+"</a>", html)
         return newHtml
 
     def displayMarkdown (self, filename):
@@ -144,6 +144,13 @@ class WikiOrgGui:
             html = """<html>
 <head>
 <title>%s</title>
+<style type="text/css">
+a { color:#6666FF; font-style: italic; }
+a:after { content:" (ext)"; }
+.wikilink { color:#0000FF; font-style: normal; }
+.wikilink:after { content:""; }
+</style>
+
 </head>
 <body>
 %s
