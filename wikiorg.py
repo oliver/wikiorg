@@ -141,6 +141,15 @@ class WikiOrgGui:
         html = os.popen(cmd).read()
         if (html):
             html = self.convertWikiLinks(html)
+            html = """<html>
+<head>
+<title>%s</title>
+</head>
+<body>
+%s
+</body>
+</html>
+""" % (filename, html)
             self.viewer.setHTML(html)
             self.currentFile = filename
 
