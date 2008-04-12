@@ -61,6 +61,7 @@ class WikiOrgGui:
             parent.remove(child)
 
             self.tree.get_widget('btnSave').set_property('sensitive', False)
+            self.tree.get_widget('miSave').set_property('sensitive', False)
             self.displayMarkdown(self.currentFile)
 
             parent.add(self.viewer.getWidget())
@@ -84,6 +85,7 @@ class WikiOrgGui:
             self.editMode = True
 
             self.tree.get_widget('btnSave').set_property('sensitive', True)
+            self.tree.get_widget('miSave').set_property('sensitive', True)
 
     def on_btnSave_clicked (self, widget):
         print "(save)"
