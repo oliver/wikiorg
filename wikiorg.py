@@ -89,6 +89,11 @@ class WikiOrgGui:
         f.write(text)
         f.close()
 
+    def on_miSave_activate (self, dummy):
+        print "(miSave)"
+        if self.editMode:
+            self.on_btnSave_clicked(dummy)
+
     def on_btnHome_clicked (self, widget):
         print "(home)"
         if not(self.editMode): # TODO: what to do if we're in edit mode?
