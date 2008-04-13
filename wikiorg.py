@@ -11,6 +11,60 @@ import pango
 from htmlviewer import HtmlViewer
 
 
+class LinkHistory:
+    """ Stores information about visited pages (for back/forward buttons) """
+    def __init__ (self, gui):
+        self.gui = gui
+        self.visited = []
+        self.currentPage = None
+
+    def pushLink (self, url):
+        if self.currentPage != None and url == self.getCurrentUrl():
+            print "(history: url '%s' is current url - not adding)" % url
+            return
+
+        # remove all "forward" pages:
+        if self.currentPage != None:
+            self.visited = self.visited[:self.currentPage + 1]
+
+        self.visited.append(url)
+        self.currentPage = len(self.visited) - 1
+
+        print "(added URL '%s')" % url
+        print "canGoBack: %d" % self.canGoBack()
+        self.notifyGui()
+
+    def notifyGui (self):
+        self.gui.setHistoryButtonState(self.canGoBack(), self.canGoForward())
+        pass
+
+    def canGoBack (self):
+        return self.currentPage > 0
+
+    def canGoForward (self):
+        return self.currentPage < (len(self.visited) - 1)
+
+    def getCurrentUrl (self):
+        assert(self.currentPage != None)
+        return self.visited[self.currentPage]
+
+    def goBack (self):
+        if self.canGoBack():
+            self.currentPage = self.currentPage - 1
+            self.notifyGui()
+            self.gui.displayMarkdown( self.getCurrentUrl() )
+        else:
+            print "warning: tried to go back in history but there is no older page"
+
+    def goForward (self):
+        if self.canGoForward():
+            self.currentPage = self.currentPage + 1
+            self.notifyGui()
+            self.gui.displayMarkdown( self.getCurrentUrl() )
+        else:
+            print "warning: tried to go forward in history but there is no newer page"
+
+
 class WikiOrgGui:
     """ Main class for this application (holds the GUI etc.) """
     def __init__ (self):
@@ -20,6 +74,9 @@ class WikiOrgGui:
         self.gladeFile = "wikiorg.glade"
         self.tree = gtk.glade.XML(self.gladeFile)
         self.tree.signal_autoconnect(self)
+
+        # set up link history:
+        self.linkHistory = LinkHistory(self)
 
         # set up HTML viewer widget:
         self.viewer = HtmlViewer()
@@ -109,6 +166,18 @@ class WikiOrgGui:
         self.tree.get_widget('btnSave').set_property('sensitive', True)
         self.tree.get_widget('miSave').set_property('sensitive', True)
 
+    def on_btnGoBack_clicked (self, widget):
+        print "(go back)"
+        self.linkHistory.goBack()
+
+    def on_btnGoForward_clicked (self, widget):
+        print "(go forward)"
+        self.linkHistory.goForward()
+
+    def setHistoryButtonState (self, backEnabled, forwardEnabled):
+        self.tree.get_widget('btnGoBack').set_property('sensitive', backEnabled)
+        self.tree.get_widget('btnGoForward').set_property('sensitive', forwardEnabled)
+
     def linkHandler (self, url):
         """Is called when a link is clicked in HTML view"""
         print "link clicked (%s)" % url
@@ -159,6 +228,7 @@ a:after { content:" (ext)"; }
 """ % (filename, html)
             self.viewer.setHTML(html)
             self.currentFile = filename
+            self.linkHistory.pushLink(filename)
 
 
 if __name__ == "__main__":

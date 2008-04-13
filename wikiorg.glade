@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.1 on Sun Apr 13 00:09:26 2008 -->
+<!--Generated with glade3 3.4.1 on Sun Apr 13 14:03:54 2008 -->
 <glade-interface>
   <widget class="GtkWindow" id="mainWindow">
     <property name="visible">True</property>
@@ -181,20 +181,22 @@
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <child>
-              <widget class="GtkToolButton" id="toolbutton1">
+              <widget class="GtkToolButton" id="btnGoBack">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="stock_id">gtk-go-back</property>
+                <signal name="clicked" handler="on_btnGoBack_clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkToolButton" id="toolbutton7">
+              <widget class="GtkToolButton" id="btnGoForward">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="stock_id">gtk-go-forward</property>
+                <signal name="clicked" handler="on_btnGoForward_clicked"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
