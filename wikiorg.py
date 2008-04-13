@@ -42,8 +42,8 @@ class LinkHistory:
         assert(count > 0)
         return self.currentPage > (count - 1)
 
-    def canGoForward (self):
-        return self.currentPage < (len(self.visited) - 1)
+    def canGoForward (self, count = 1):
+        return self.currentPage < (len(self.visited) - count)
 
     def getCurrentUrl (self):
         assert(self.currentPage != None)
@@ -57,6 +57,12 @@ class LinkHistory:
             pages.reverse()
             return pages
 
+    def getForwardPages (self):
+        if self.currentPage == None:
+            return []
+        else:
+            return self.visited[self.currentPage + 1:]
+
     def goBack (self, count = 1):
         if self.canGoBack(count):
             self.currentPage = self.currentPage - count
@@ -65,13 +71,13 @@ class LinkHistory:
         else:
             print "warning: tried to go back in history but there are not enough older pages"
 
-    def goForward (self):
-        if self.canGoForward():
-            self.currentPage = self.currentPage + 1
+    def goForward (self, count = 1):
+        if self.canGoForward(count):
+            self.currentPage = self.currentPage + count
             self.notifyGui()
             self.gui.displayMarkdown( self.getCurrentUrl() )
         else:
-            print "warning: tried to go forward in history but there is no newer page"
+            print "warning: tried to go forward in history but there are not enough newer pages"
 
 
 class WikiOrgGui:
@@ -91,6 +97,10 @@ class WikiOrgGui:
         btnGoBack = self.tree.get_widget("btnGoBack")
         self.backMenu = gtk.Menu()
         btnGoBack.set_menu(self.backMenu)
+
+        btnGoForward = self.tree.get_widget("btnGoForward")
+        self.forwardMenu = gtk.Menu()
+        btnGoForward.set_menu(self.forwardMenu)
 
         # set up HTML viewer widget:
         self.viewer = HtmlViewer()
@@ -192,6 +202,10 @@ class WikiOrgGui:
         print "(back menu item at pos. %d)" % position
         self.linkHistory.goBack(position)
 
+    def on_forwardMenuItem_activate (self, item, position):
+        print "(forward menu item at pos. %d)" % position
+        self.linkHistory.goForward(position)
+
     def setHistoryButtonState (self, backEnabled, forwardEnabled):
         self.tree.get_widget('btnGoBack').set_property('sensitive', backEnabled)
         self.tree.get_widget('btnGoForward').set_property('sensitive', forwardEnabled)
@@ -207,6 +221,19 @@ class WikiOrgGui:
             mi.connect('activate', self.on_backMenuItem_activate, itemPos)
             mi.show()
             self.backMenu.append(mi)
+            itemPos = itemPos + 1
+
+        # delete all entries from forward button menu:
+        for mi in self.forwardMenu.get_children():
+            self.forwardMenu.remove(mi)
+
+        # add current entries to forward button menu:
+        itemPos = 1
+        for url in self.linkHistory.getForwardPages():
+            mi = gtk.MenuItem(url)
+            mi.connect('activate', self.on_forwardMenuItem_activate, itemPos)
+            mi.show()
+            self.forwardMenu.append(mi)
             itemPos = itemPos + 1
 
     def linkHandler (self, url):
