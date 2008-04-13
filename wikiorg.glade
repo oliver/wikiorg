@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.1 on Sun Apr 13 16:21:49 2008 -->
+<!--Generated with glade3 3.4.1 on Sun Apr 13 16:59:45 2008 -->
 <glade-interface>
   <widget class="GtkWindow" id="mainWindow">
     <property name="visible">True</property>
@@ -316,11 +316,12 @@
           </packing>
         </child>
         <child>
-          <widget class="GtkLabel" id="label1">
+          <widget class="GtkLabel" id="lblStatusBar">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="xalign">0</property>
-            <property name="label" translatable="yes">wikiorg gestartet</property>
+            <property name="label" translatable="yes">WikiOrg started</property>
+            <property name="use_markup">True</property>
           </widget>
           <packing>
             <property name="expand">False</property>

@@ -299,6 +299,7 @@ a:after { content:" (ext)"; }
 """ % (filename, html)
             self.viewer.setHTML(html)
             self.currentFile = filename
+            self.tree.get_widget("lblStatusBar").set_label("<i>%s</i>" % filename)
             self.linkHistory.pushLink(filename)
 
 
