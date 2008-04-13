@@ -28,11 +28,25 @@ class GitStorageBackend:
         # TODO: check for directory, and regular file, and whatnot...
         return os.path.exists(filename)
 
-    #def createNewPage (self, pagename):
-        #filename = self.pageToFile(pagename)
-        #f = open(filename, "w")
-        #f.write("enter text for %s here..." % pagename)
-        #f.close()
+    def createNewPage (self, pagename):
+        filename = self.pageToFile(pagename)
+        f = open(filename, "w")
+        f.write("enter text for %s here..." % pagename)
+        f.close()
+
+        # add file to Git:
+        shortFilename = re.sub("^%s" % self.directory, "", filename)
+        cmd = "git add -- '%s'" % shortFilename
+        print "(cmd: %s)" % cmd
+        pipe = os.popen(cmd)
+        result = pipe.read()
+        exitCode = pipe.close()
+        if exitCode != None:
+            exitCode = os.WEXITSTATUS(exitCode)
+            print "git-add exitCode: %d" % exitCode
+        else:
+            print "successfully added"
+
 
     def getPageContent (self, pagename):
         filename = self.pageToFile(pagename)
