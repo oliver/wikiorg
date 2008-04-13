@@ -98,6 +98,7 @@ class WikiOrgGui:
     def __init__ (self):
         self.currentFile = None
         self.editMode = False
+        self.textChanged = False
 
         self.gladeFile = "wikiorg.glade"
         self.tree = gtk.glade.XML(self.gladeFile)
@@ -147,6 +148,23 @@ class WikiOrgGui:
 
     def on_btnEdit_clicked (self, widget):
         if self.editMode:
+            if self.textChanged:
+                print "(unsaved changes left)"
+                parentWin = self.tree.get_widget("mainWindow")
+                saveDialog = gtk.MessageDialog(parentWin, gtk.DIALOG_MODAL,
+                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+                    "There are unsaved changes.")
+                saveDialog.format_secondary_text("Do you want to save?")
+                saveDialog.set_default_response(gtk.RESPONSE_YES)
+
+                result = saveDialog.run()
+                saveDialog.destroy()
+                if result == gtk.RESPONSE_YES:
+                    print "(do save)"
+                    self.on_btnSave_clicked(None)
+                else:
+                    print "(don't save)"
+
             print "(back to view)"
             parent = self.tree.get_widget('mainScrollWin')
             child = parent.get_children()[0]
@@ -174,6 +192,7 @@ class WikiOrgGui:
             text = f.read()
             f.close()
             self.textBuffer.set_text(text)
+            self.textChanged = False
             self.changeHandlerId = self.textBuffer.connect('changed', self.on_textBuffer_changed)
 
             parent.add(self.textView)
@@ -186,6 +205,7 @@ class WikiOrgGui:
         f = open(self.currentFile, "w")
         f.write(text)
         f.close()
+        self.textChanged = False
         self.tree.get_widget('btnSave').set_property('sensitive', False)
         self.tree.get_widget('miSave').set_property('sensitive', False)
 
@@ -200,6 +220,7 @@ class WikiOrgGui:
             self.displayMarkdown('index.markdown')
 
     def on_textBuffer_changed (self, textBuffer):
+        self.textChanged = True
         self.tree.get_widget('btnSave').set_property('sensitive', True)
         self.tree.get_widget('miSave').set_property('sensitive', True)
 
