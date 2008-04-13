@@ -12,13 +12,20 @@ from htmlviewer import HtmlViewer
 
 
 class LinkHistory:
-    """ Stores information about visited pages (for back/forward buttons) """
+    """
+    Stores information about visited pages (for back/forward buttons).
+    Note that many functions only work after at least one URL has been added (with pushLink).
+    """
     def __init__ (self, gui):
+        """
+        "gui" is the WikiOrgGui object that displays the history buttons.
+        """
         self.gui = gui
-        self.visited = []
-        self.currentPage = None
+        self.visited = [] # list of pages (contains back, forward, and current pages)
+        self.currentPage = None # index of current page (in self.visited)
 
     def pushLink (self, url):
+        """ Add given URL to top of history """
         if self.currentPage != None and url == self.getCurrentUrl():
             print "(history: url '%s' is current url - not adding)" % url
             return
@@ -31,25 +38,28 @@ class LinkHistory:
         self.currentPage = len(self.visited) - 1
 
         print "(added URL '%s')" % url
-        print "canGoBack: %d" % self.canGoBack()
         self.notifyGui()
 
     def notifyGui (self):
+        """ Inform GUI object that it has to update its history display. """
         self.gui.setHistoryButtonState(self.canGoBack(), self.canGoForward())
-        pass
 
     def canGoBack (self, count = 1):
+        """ Returns true if history can go back 'count' pages. """
         assert(count > 0)
         return self.currentPage > (count - 1)
 
     def canGoForward (self, count = 1):
+        """ Returns true if history can go forward 'count' pages. """
         return self.currentPage < (len(self.visited) - count)
 
     def getCurrentUrl (self):
+        """ Returns URL of current page. """
         assert(self.currentPage != None)
         return self.visited[self.currentPage]
 
     def getBackPages (self):
+        """ Returns a list of 'past' pages (order: newest first). """
         if self.currentPage == None:
             return []
         else:
@@ -58,12 +68,14 @@ class LinkHistory:
             return pages
 
     def getForwardPages (self):
+        """ Returns a list of 'future' pages (order: oldest first). """
         if self.currentPage == None:
             return []
         else:
             return self.visited[self.currentPage + 1:]
 
     def goBack (self, count = 1):
+        """ Go back 'count' pages. """
         if self.canGoBack(count):
             self.currentPage = self.currentPage - count
             self.notifyGui()
@@ -72,6 +84,7 @@ class LinkHistory:
             print "warning: tried to go back in history but there are not enough older pages"
 
     def goForward (self, count = 1):
+        """ Go forward 'count' pages. """
         if self.canGoForward(count):
             self.currentPage = self.currentPage + count
             self.notifyGui()
