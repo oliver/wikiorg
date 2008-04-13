@@ -10,7 +10,7 @@ import gobject
 import pango
 
 from htmlviewer import HtmlViewer
-from filebackend import FileStorageBackend
+from gitbackend import GitStorageBackend
 
 class LinkHistory:
     """
@@ -108,7 +108,7 @@ class WikiOrgGui:
         self.tree.signal_autoconnect(self)
 
         # set up storage backend:
-        self.storage = FileStorageBackend()
+        self.storage = GitStorageBackend()
 
         # set up link history:
         self.linkHistory = LinkHistory(self)
