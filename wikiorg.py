@@ -38,8 +38,9 @@ class LinkHistory:
         self.gui.setHistoryButtonState(self.canGoBack(), self.canGoForward())
         pass
 
-    def canGoBack (self):
-        return self.currentPage > 0
+    def canGoBack (self, count = 1):
+        assert(count > 0)
+        return self.currentPage > (count - 1)
 
     def canGoForward (self):
         return self.currentPage < (len(self.visited) - 1)
@@ -56,13 +57,13 @@ class LinkHistory:
             pages.reverse()
             return pages
 
-    def goBack (self):
-        if self.canGoBack():
-            self.currentPage = self.currentPage - 1
+    def goBack (self, count = 1):
+        if self.canGoBack(count):
+            self.currentPage = self.currentPage - count
             self.notifyGui()
             self.gui.displayMarkdown( self.getCurrentUrl() )
         else:
-            print "warning: tried to go back in history but there is no older page"
+            print "warning: tried to go back in history but there are not enough older pages"
 
     def goForward (self):
         if self.canGoForward():
@@ -187,8 +188,9 @@ class WikiOrgGui:
         print "(go forward)"
         self.linkHistory.goForward()
 
-    def on_backMenuItem_activate (self, item, url):
-        print "(back menu item '%s')" % url
+    def on_backMenuItem_activate (self, item, position):
+        print "(back menu item at pos. %d)" % position
+        self.linkHistory.goBack(position)
 
     def setHistoryButtonState (self, backEnabled, forwardEnabled):
         self.tree.get_widget('btnGoBack').set_property('sensitive', backEnabled)
@@ -199,11 +201,13 @@ class WikiOrgGui:
             self.backMenu.remove(mi)
 
         # add current entries to back button menu:
+        itemPos = 1
         for url in self.linkHistory.getBackPages():
             mi = gtk.MenuItem(url)
-            mi.connect('activate', self.on_backMenuItem_activate, url)
+            mi.connect('activate', self.on_backMenuItem_activate, itemPos)
             mi.show()
             self.backMenu.append(mi)
+            itemPos = itemPos + 1
 
     def linkHandler (self, url):
         """Is called when a link is clicked in HTML view"""
