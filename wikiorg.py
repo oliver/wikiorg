@@ -22,20 +22,20 @@ class LinkHistory:
         """
         self.gui = gui
         self.visited = [] # list of pages (contains back, forward, and current pages)
-        self.currentPage = None # index of current page (in self.visited)
+        self.currentPageIndex = None # index of current page (in self.visited)
 
     def pushPageName (self, page):
         """ Add given page to top of history """
-        if self.currentPage != None and page == self.getCurrentPage():
+        if self.currentPageIndex != None and page == self.getCurrentPage():
             print "(history: page '%s' is current page - not adding)" % page
             return
 
         # remove all "forward" pages:
-        if self.currentPage != None:
-            self.visited = self.visited[:self.currentPage + 1]
+        if self.currentPageIndex != None:
+            self.visited = self.visited[:self.currentPageIndex + 1]
 
         self.visited.append(page)
-        self.currentPage = len(self.visited) - 1
+        self.currentPageIndex = len(self.visited) - 1
 
         print "(added page '%s')" % page
         self.notifyGui()
@@ -47,37 +47,37 @@ class LinkHistory:
     def canGoBack (self, count = 1):
         """ Returns true if history can go back 'count' pages. """
         assert(count > 0)
-        return self.currentPage > (count - 1)
+        return self.currentPageIndex > (count - 1)
 
     def canGoForward (self, count = 1):
         """ Returns true if history can go forward 'count' pages. """
-        return self.currentPage < (len(self.visited) - count)
+        return self.currentPageIndex < (len(self.visited) - count)
 
     def getCurrentPage (self):
         """ Returns name of current page. """
-        assert(self.currentPage != None)
-        return self.visited[self.currentPage]
+        assert(self.currentPageIndex != None)
+        return self.visited[self.currentPageIndex]
 
     def getBackPages (self):
         """ Returns a list of 'past' pages (order: newest first). """
-        if self.currentPage == None:
+        if self.currentPageIndex == None:
             return []
         else:
-            pages = self.visited[:self.currentPage]
+            pages = self.visited[:self.currentPageIndex]
             pages.reverse()
             return pages
 
     def getForwardPages (self):
         """ Returns a list of 'future' pages (order: oldest first). """
-        if self.currentPage == None:
+        if self.currentPageIndex == None:
             return []
         else:
-            return self.visited[self.currentPage + 1:]
+            return self.visited[self.currentPageIndex + 1:]
 
     def goBack (self, count = 1):
         """ Go back 'count' pages. """
         if self.canGoBack(count):
-            self.currentPage = self.currentPage - count
+            self.currentPageIndex = self.currentPageIndex - count
             self.notifyGui()
             self.gui.displayMarkdown( self.getCurrentPage() )
         else:
@@ -86,7 +86,7 @@ class LinkHistory:
     def goForward (self, count = 1):
         """ Go forward 'count' pages. """
         if self.canGoForward(count):
-            self.currentPage = self.currentPage + count
+            self.currentPageIndex = self.currentPageIndex + count
             self.notifyGui()
             self.gui.displayMarkdown( self.getCurrentPage() )
         else:
