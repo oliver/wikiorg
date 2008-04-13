@@ -103,7 +103,7 @@ class FileStorageBackend:
         # TODO: check for directory, and regular file, and whatnot...
         return os.path.exists(filename)
 
-    def createNewPage (pagename):
+    def createNewPage (self, pagename):
         filename = self.pageToFile(pagename)
         f = open(filename, "w")
         f.write("enter text for %s here..." % pagename)
