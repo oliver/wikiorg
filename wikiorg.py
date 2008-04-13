@@ -109,6 +109,19 @@ class FileStorageBackend:
         f.write("enter text for %s here..." % pagename)
         f.close()
 
+    def getPageContent (self, pagename):
+        filename = self.pageToFile(pagename)
+        f = open(filename, "r")
+        text = f.read()
+        f.close()
+        return text
+
+    def savePageContent (self, pagename, text):
+        filename = self.pageToFile(pagename)
+        f = open(filename, "w")
+        f.write(text)
+        f.close()
+
     def pageToFile (self, wikiword):
         """ Translates a page name (wiki word) into a file name. """
         return "%s/%s.markdown" % (self.directory, wikiword)
@@ -211,11 +224,8 @@ class WikiOrgGui:
             assert(child == self.viewer.getWidget())
             parent.remove(child)
 
-            # load file content:
-            filename = self.storage.pageToFile(self.currentPage)
-            f = open(filename, "r")
-            text = f.read()
-            f.close()
+            # load page content:
+            text = self.storage.getPageContent(self.currentPage)
             self.textBuffer.set_text(text)
             self.textChanged = False
             self.changeHandlerId = self.textBuffer.connect('changed', self.on_textBuffer_changed)
@@ -227,10 +237,7 @@ class WikiOrgGui:
     def on_btnSave_clicked (self, widget):
         print "(save)"
         text = self.textBuffer.get_text(*self.textBuffer.get_bounds())
-        filename = self.storage.pageToFile(self.currentPage)
-        f = open(filename, "w")
-        f.write(text)
-        f.close()
+        self.storage.savePageContent(self.currentPage, text)
         self.textChanged = False
         self.tree.get_widget('btnSave').set_property('sensitive', False)
         self.tree.get_widget('miSave').set_property('sensitive', False)
