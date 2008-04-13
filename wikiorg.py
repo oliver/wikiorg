@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import sys
 import re
 import gtk
 import gtk.glade
@@ -96,11 +97,13 @@ class LinkHistory:
 class WikiOrgGui:
     """ Main class for this application (holds the GUI etc.) """
     def __init__ (self):
+        self.appdir = os.path.realpath( os.path.dirname(sys.argv[0]) )
+
         self.currentPage = None
         self.editMode = False
         self.textChanged = False
 
-        self.gladeFile = "wikiorg.glade"
+        self.gladeFile = "%s/wikiorg.glade" % self.appdir
         self.tree = gtk.glade.XML(self.gladeFile)
         self.tree.signal_autoconnect(self)
 
@@ -303,7 +306,7 @@ class WikiOrgGui:
     def displayMarkdown (self, wikiword):
         """ Convert the Markdown+WikiLink text to HTML, and display the HTML """
         filename = self.storage.pageToFile(wikiword)
-        cmd = "perl Markdown.pl < '%s'" % filename
+        cmd = "perl %s/Markdown.pl < '%s'" % (self.appdir, filename)
         html = os.popen(cmd).read()
         if (html):
             html = self.convertWikiLinks(html)
