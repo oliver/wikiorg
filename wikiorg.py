@@ -14,7 +14,7 @@ from htmlviewer import HtmlViewer
 class LinkHistory:
     """
     Stores information about visited pages (for back/forward buttons).
-    Note that many functions only work after at least one URL has been added (with pushLink).
+    Note that many functions only work after at least one page has been added (with pushPageName).
     """
     def __init__ (self, gui):
         """
@@ -24,20 +24,20 @@ class LinkHistory:
         self.visited = [] # list of pages (contains back, forward, and current pages)
         self.currentPage = None # index of current page (in self.visited)
 
-    def pushLink (self, url):
-        """ Add given URL to top of history """
-        if self.currentPage != None and url == self.getCurrentUrl():
-            print "(history: url '%s' is current url - not adding)" % url
+    def pushPageName (self, page):
+        """ Add given page to top of history """
+        if self.currentPage != None and page == self.getCurrentPage():
+            print "(history: page '%s' is current page - not adding)" % page
             return
 
         # remove all "forward" pages:
         if self.currentPage != None:
             self.visited = self.visited[:self.currentPage + 1]
 
-        self.visited.append(url)
+        self.visited.append(page)
         self.currentPage = len(self.visited) - 1
 
-        print "(added URL '%s')" % url
+        print "(added page '%s')" % page
         self.notifyGui()
 
     def notifyGui (self):
@@ -53,8 +53,8 @@ class LinkHistory:
         """ Returns true if history can go forward 'count' pages. """
         return self.currentPage < (len(self.visited) - count)
 
-    def getCurrentUrl (self):
-        """ Returns URL of current page. """
+    def getCurrentPage (self):
+        """ Returns name of current page. """
         assert(self.currentPage != None)
         return self.visited[self.currentPage]
 
@@ -79,7 +79,7 @@ class LinkHistory:
         if self.canGoBack(count):
             self.currentPage = self.currentPage - count
             self.notifyGui()
-            self.gui.displayMarkdown( self.getCurrentUrl() )
+            self.gui.displayMarkdown( self.getCurrentPage() )
         else:
             print "warning: tried to go back in history but there are not enough older pages"
 
@@ -88,7 +88,7 @@ class LinkHistory:
         if self.canGoForward(count):
             self.currentPage = self.currentPage + count
             self.notifyGui()
-            self.gui.displayMarkdown( self.getCurrentUrl() )
+            self.gui.displayMarkdown( self.getCurrentPage() )
         else:
             print "warning: tried to go forward in history but there are not enough newer pages"
 
@@ -283,8 +283,8 @@ class WikiOrgGui:
 
         # add current entries to back button menu:
         itemPos = 1
-        for url in self.linkHistory.getBackPages():
-            mi = gtk.MenuItem(url)
+        for page in self.linkHistory.getBackPages():
+            mi = gtk.MenuItem(page)
             mi.connect('activate', self.on_backMenuItem_activate, itemPos)
             mi.show()
             self.backMenu.append(mi)
@@ -296,8 +296,8 @@ class WikiOrgGui:
 
         # add current entries to forward button menu:
         itemPos = 1
-        for url in self.linkHistory.getForwardPages():
-            mi = gtk.MenuItem(url)
+        for page in self.linkHistory.getForwardPages():
+            mi = gtk.MenuItem(page)
             mi.connect('activate', self.on_forwardMenuItem_activate, itemPos)
             mi.show()
             self.forwardMenu.append(mi)
@@ -353,7 +353,7 @@ a:after { content:" (ext)"; }
             self.viewer.setHTML(html)
             self.currentPage = wikiword
             self.tree.get_widget("lblStatusBar").set_label("<i>%s</i>" % wikiword)
-            self.linkHistory.pushLink(wikiword)
+            self.linkHistory.pushPageName(wikiword)
 
 if __name__ == "__main__":
     gui = WikiOrgGui()
