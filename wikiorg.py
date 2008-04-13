@@ -319,12 +319,19 @@ class WikiOrgGui:
         else:
             os.system("xdg-open '%s' &" % url)
 
+    def wikiwordToHtmlLink (self, wikiword):
+        """ Returns an HTML link tag for the given wikiword. """
+        if self.storage.pageExists(wikiword):
+            return "<a class='wikilink' href='wiki://%s'>%s</a>" % (wikiword, wikiword)
+        else:
+            return "<a class='wikilinkbroken' href='wiki://%s'>%s</a>" % (wikiword, wikiword)
+
     # TODO: maybe use another syntax for wiki links.
     # See http://boodler.org/wiki/show/Markdown/ for an idea
     def convertWikiLinks (self, html):
         """ Converts Wiki links in the given HTML text to HTML tags """
         newHtml = re.sub("\[\[([\w ]+)\]\]",
-            lambda x: "<a class='wikilink' href='wiki://"+x.groups()[0]+"'>"+x.groups()[0]+"</a>", html)
+            lambda x: self.wikiwordToHtmlLink(x.groups()[0]), html)
         return newHtml
 
     def displayMarkdown (self, wikiword):
@@ -342,6 +349,8 @@ a { color:#6666FF; font-style: italic; }
 a:after { content:" (ext)"; }
 .wikilink { color:#0000FF; font-style: normal; }
 .wikilink:after { content:""; }
+.wikilinkbroken { color:#FF0000; font-style: normal; }
+.wikilinkbroken:after { content:""; }
 </style>
 
 </head>
