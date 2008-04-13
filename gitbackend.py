@@ -11,10 +11,15 @@ class GitStorageBackend:
         cmd = "git status"
         pipe = os.popen(cmd)
         result = pipe.read()
-        exitCode = os.WEXITSTATUS(pipe.close())
+        exitCode = pipe.close()
+        if exitCode == None:
+            exitCode = 0
+        else:
+            exitCode = os.WEXITSTATUS(exitCode)
+
         print "exitCode: %d" % exitCode
 
-        if exitCode != 1:
+        if exitCode > 1:
             print "error opening Git repo ('git status' returned with code %d)" % (exitCode)
             sys.exit(1)
 
