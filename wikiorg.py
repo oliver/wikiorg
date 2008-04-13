@@ -48,6 +48,14 @@ class LinkHistory:
         assert(self.currentPage != None)
         return self.visited[self.currentPage]
 
+    def getBackPages (self):
+        if self.currentPage == None:
+            return []
+        else:
+            pages = self.visited[:self.currentPage]
+            pages.reverse()
+            return pages
+
     def goBack (self):
         if self.canGoBack():
             self.currentPage = self.currentPage - 1
@@ -77,6 +85,11 @@ class WikiOrgGui:
 
         # set up link history:
         self.linkHistory = LinkHistory(self)
+
+        # set up menus for back/forward buttons:
+        btnGoBack = self.tree.get_widget("btnGoBack")
+        self.backMenu = gtk.Menu()
+        btnGoBack.set_menu(self.backMenu)
 
         # set up HTML viewer widget:
         self.viewer = HtmlViewer()
@@ -174,9 +187,23 @@ class WikiOrgGui:
         print "(go forward)"
         self.linkHistory.goForward()
 
+    def on_backMenuItem_activate (self, item, url):
+        print "(back menu item '%s')" % url
+
     def setHistoryButtonState (self, backEnabled, forwardEnabled):
         self.tree.get_widget('btnGoBack').set_property('sensitive', backEnabled)
         self.tree.get_widget('btnGoForward').set_property('sensitive', forwardEnabled)
+
+        # delete all entries from back button menu:
+        for mi in self.backMenu.get_children():
+            self.backMenu.remove(mi)
+
+        # add current entries to back button menu:
+        for url in self.linkHistory.getBackPages():
+            mi = gtk.MenuItem(url)
+            mi.connect('activate', self.on_backMenuItem_activate, url)
+            mi.show()
+            self.backMenu.append(mi)
 
     def linkHandler (self, url):
         """Is called when a link is clicked in HTML view"""
