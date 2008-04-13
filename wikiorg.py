@@ -93,16 +93,40 @@ class LinkHistory:
             print "warning: tried to go forward in history but there are not enough newer pages"
 
 
+class FileStorageBackend:
+    """ Handles the actual storage of wiki pages to files. """
+    def __init__ (self):
+        self.directory = "." # the directory where files are saved
+
+    def pageExists (self, pagename):
+        filename = self.pageToFile(pagename)
+        # TODO: check for directory, and regular file, and whatnot...
+        return os.path.exists(filename)
+
+    def createNewPage (pagename):
+        filename = self.pageToFile(pagename)
+        f = open(filename, "w")
+        f.write("enter text for %s here..." % pagename)
+        f.close()
+
+    def pageToFile (self, wikiword):
+        """ Translates a page name (wiki word) into a file name. """
+        return "%s/%s.markdown" % (self.directory, wikiword)
+
+
 class WikiOrgGui:
     """ Main class for this application (holds the GUI etc.) """
     def __init__ (self):
-        self.currentFile = None
+        self.currentPage = None
         self.editMode = False
         self.textChanged = False
 
         self.gladeFile = "wikiorg.glade"
         self.tree = gtk.glade.XML(self.gladeFile)
         self.tree.signal_autoconnect(self)
+
+        # set up storage backend:
+        self.storage = FileStorageBackend()
 
         # set up link history:
         self.linkHistory = LinkHistory(self)
@@ -138,7 +162,7 @@ class WikiOrgGui:
         self.textView.set_buffer(self.textBuffer)
 
         # display start page:
-        self.displayMarkdown('index.markdown')
+        self.displayMarkdown('index')
 
     def on_mainWindow_delete_event (self, widget, dummy):
         gtk.main_quit()
@@ -175,7 +199,7 @@ class WikiOrgGui:
             self.changeHandlerId = None
             self.tree.get_widget('btnSave').set_property('sensitive', False)
             self.tree.get_widget('miSave').set_property('sensitive', False)
-            self.displayMarkdown(self.currentFile)
+            self.displayMarkdown(self.currentPage)
 
             parent.add(self.viewer.getWidget())
             self.tree.get_widget('btnEdit').set_property('stock_id', 'gtk-edit')
@@ -188,7 +212,8 @@ class WikiOrgGui:
             parent.remove(child)
 
             # load file content:
-            f = open(self.currentFile, "r")
+            filename = self.storage.pageToFile(self.currentPage)
+            f = open(filename, "r")
             text = f.read()
             f.close()
             self.textBuffer.set_text(text)
@@ -202,7 +227,8 @@ class WikiOrgGui:
     def on_btnSave_clicked (self, widget):
         print "(save)"
         text = self.textBuffer.get_text(*self.textBuffer.get_bounds())
-        f = open(self.currentFile, "w")
+        filename = self.storage.pageToFile(self.currentPage)
+        f = open(filename, "w")
         f.write(text)
         f.close()
         self.textChanged = False
@@ -217,7 +243,7 @@ class WikiOrgGui:
     def on_btnHome_clicked (self, widget):
         print "(home)"
         if not(self.editMode): # TODO: what to do if we're in edit mode?
-            self.displayMarkdown('index.markdown')
+            self.displayMarkdown('index')
 
     def on_textBuffer_changed (self, textBuffer):
         self.textChanged = True
@@ -275,16 +301,14 @@ class WikiOrgGui:
         print "link clicked (%s)" % url
         if url.startswith('wiki://'):
             wikiword = url[7:]
-            filename = "./%s.markdown" % wikiword
-            print "(internal link to '%s'; file: '%s')" % (wikiword, filename)
+            print "(internal link to '%s')" % wikiword
 
-            if not(os.path.exists(filename)): # TODO: check for directory, and regular file, and whatnot...
-                # create new file
-                f = open(filename, "w")
-                f.write("enter text for %s here..." % wikiword)
-                f.close()
+            # create new page if necessary:
+            if not(self.storage.pageExists(wikiword)):
+                self.storage.createNewPage(wikiword)
                 # TODO: maybe switch to edit mode here?
-            self.displayMarkdown(filename)
+
+            self.displayMarkdown(wikiword)
         else:
             os.system("xdg-open '%s' &" % url)
 
@@ -296,8 +320,9 @@ class WikiOrgGui:
             lambda x: "<a class='wikilink' href='wiki://"+x.groups()[0]+"'>"+x.groups()[0]+"</a>", html)
         return newHtml
 
-    def displayMarkdown (self, filename):
-        """ Convert the given Markdown+WikiLink text to HTML, and display the HTML """
+    def displayMarkdown (self, wikiword):
+        """ Convert the Markdown+WikiLink text to HTML, and display the HTML """
+        filename = self.storage.pageToFile(wikiword)
         cmd = "perl Markdown.pl < '%s'" % filename
         html = os.popen(cmd).read()
         if (html):
@@ -317,12 +342,11 @@ a:after { content:" (ext)"; }
 %s
 </body>
 </html>
-""" % (filename, html)
+""" % (wikiword, html)
             self.viewer.setHTML(html)
-            self.currentFile = filename
-            self.tree.get_widget("lblStatusBar").set_label("<i>%s</i>" % filename)
-            self.linkHistory.pushLink(filename)
-
+            self.currentPage = wikiword
+            self.tree.get_widget("lblStatusBar").set_label("<i>%s</i>" % wikiword)
+            self.linkHistory.pushLink(wikiword)
 
 if __name__ == "__main__":
     gui = WikiOrgGui()
